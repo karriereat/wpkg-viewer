@@ -20,14 +20,14 @@ class MachineController extends Controller
         $machines = $machineLoader->machines;
 
         $machineFound = false;
-        foreach($machines as $hostname => $machine) {
-            if(strtolower($hostname) == $hostenameParam) {
+        foreach ($machines as $hostname => $machine) {
+            if (strtolower($hostname) == $hostenameParam) {
                 $machineFound = true;
                 break;
             }
         }
         if (!$machineFound) {
-           return abort(404);
+            return abort(404);
         }
 
         return View('machine', ['machine' => $machine]);

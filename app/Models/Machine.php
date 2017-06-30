@@ -1,19 +1,20 @@
-<?php  // refactor me
+<?php // refactor me
 
 namespace App\Models;
 
-class Machine {
+class Machine
+{
     public $hostname;
     public $status = null;
-    public $profiles = array();
+    public $profiles = [];
     public $lastUpdate = null;
-    public $system = array(
-        "os"            =>  array(
-            "name"      =>  null,
-            "sp"        =>  null,
-            "version"   =>  null,
-            "architecture"  =>  null,
-        ),
-        "domain"        =>  null,
-    );
+    public $system = [
+        "os" => [
+            "name" => null,
+            "sp" => null,
+            "version" => null,
+            "architecture" => null,
+        ],
+        "domain" => null,
+    ];
 }

@@ -1,15 +1,15 @@
-<?php  // refactor me!
+<?php // refactor me!
 
 namespace App\Models;
 
-class MachineLoader {
-
+class MachineLoader
+{
     private $basePath;
     private $pathToHostsXml;
 
     private $architectures = array(
-        "x86"   =>  32,
-        "x64"   =>  64,
+        "x86" => 32,
+        "x64" => 64,
     );
 
     private $wildcardChars = ".+";
@@ -17,68 +17,71 @@ class MachineLoader {
     private $htmlArrow = ' ➡️ ';
 
     private $machineStatus = array(
-        0   =>  "ok",
-        1   =>  "host.xml not set",
-        2   =>  "no information",
+        0 => "ok",
+        1 => "host.xml not set",
+        2 => "no information",
     );
 
     public $packageStatus = array(
-        "INSTALLED"   =>  array(
-            "index" =>  0,
-            "desc"  =>  "installed",
-            "color" =>  "#FFF",
+        "INSTALLED" => array(
+            "index" => 0,
+            "desc" => "installed",
+            "color" => "#FFF",
         ),
-        "TO_INSTALL"   =>  array(
-            "index" =>  1,
-            "desc"  =>  "to be installed",
-            "color" =>  "#FFCE89",
+        "TO_INSTALL" => array(
+            "index" => 1,
+            "desc" => "to be installed",
+            "color" => "#FFCE89",
         ),
-        "TO_UPDATE"   =>  array(
-            "index" =>  2,
-            "desc"  =>  "to be updated",
-            "color" =>  "#ACFFA6",
+        "TO_UPDATE" => array(
+            "index" => 2,
+            "desc" => "to be updated",
+            "color" => "#ACFFA6",
         ),
-        "UNINSTALL"   =>  array(
-            "index" =>  3,
-            "desc"  =>  "to be uninstalled",
-            "color" =>  "#FCA9A9",
+        "UNINSTALL" => array(
+            "index" => 3,
+            "desc" => "to be uninstalled",
+            "color" => "#FCA9A9",
         ),
-        "ALWAYS"   =>  array(
-            "index" =>  4,
-            "desc"  =>  "on every start",
-            "color" =>  "#FFF",
+        "ALWAYS" => array(
+            "index" => 4,
+            "desc" => "on every start",
+            "color" => "#FFF",
         )
     );
     public $machines = array();
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->setEnvVars();
         $this->getAllMachines();
     }
 
-    public function setEnvVars() {
+    public function setEnvVars()
+    {
         $this->basePath = env('WPKG_VIEWER_BASE_PATH', 'test-files');
         $this->basePath = base_path($this->basePath);
         $this->pathToHostsXml = env('WPKG_VIEWER_PATH_TO_HOSTS_XML', 'hostxml/');
     }
 
-    public function getAllProfiles() {
+    public function getAllProfiles()
+    {
         $profiles = array();
-        foreach($this->machines as $machine) {
-            foreach($machine->profiles as $profileName => $profile) {
-                if(!array_key_exists($profileName, $profiles)) {
+        foreach ($this->machines as $machine) {
+            foreach ($machine->profiles as $profileName => $profile) {
+                if (!array_key_exists($profileName, $profiles)) {
                     $profiles[$profileName]["packages"] = array();
                     $profiles[$profileName]["amount"] = 1;
                 } else {
                     $profiles[$profileName]["amount"]++;
                 }
-                foreach($profile as $packageName => $package) {
-                    if(!array_key_exists($packageName,  $profiles[$profileName]["packages"])) {
+                foreach ($profile as $packageName => $package) {
+                    if (!array_key_exists($packageName, $profiles[$profileName]["packages"])) {
                         $profiles[$profileName]["packages"][$packageName] = array();
                         $profiles[$profileName]["packages"][$packageName][$package["status"]["desc"]] = array();
                         $profiles[$profileName]["packages"][$packageName][$package["status"]["desc"]][] = array("hostname" => $machine->hostname, "lastUpdate" => $machine->lastUpdate);
                     } else {
-                        if(!array_key_exists($package["status"]["desc"],  $profiles[$profileName]["packages"][$packageName])){
+                        if (!array_key_exists($package["status"]["desc"], $profiles[$profileName]["packages"][$packageName])) {
                             $profiles[$profileName]["packages"][$packageName][$package["status"]["desc"]] = array();
                             $profiles[$profileName]["packages"][$packageName][$package["status"]["desc"]][] = array("hostname" => $machine->hostname, "lastUpdate" => $machine->lastUpdate);
                         } else {
@@ -91,21 +94,23 @@ class MachineLoader {
         return $profiles;
     }
 
-    private function getAllMachines() {
+    private function getAllMachines()
+    {
         $this->packages = $this->loadFile("packages.xml");
 
         $this->getHosts();
         $this->getProfiles();
-        foreach($this->machines as $hostname => $machine) {
+        foreach ($this->machines as $hostname => $machine) {
             $this->getHost($hostname);
         }
         $this->finalize();
         return $this->machines;
     }
 
-    private function getPackageVersionById($id) {
-        foreach($this->packages as $package) {
-            if($id == (string) $package->attributes()->id) {
+    private function getPackageVersionById($id)
+    {
+        foreach ($this->packages as $package) {
+            if ($id == (string)$package->attributes()->id) {
                 return $this->_getVersion($package);
             }
         }
@@ -113,14 +118,15 @@ class MachineLoader {
 
     }
 
-    private function getHosts() {
+    private function getHosts()
+    {
         $hostsFromFile = $this->loadFile("hosts.xml");
         $hostsFromDir = $this->getHostsFromFolder("hostxml/");
 
-        foreach($hostsFromFile->host as $host) {
-            if(strstr($host->attributes()->name, $this->wildcardChars) !== false) {
-                foreach($hostsFromDir as $hostFromDir) {
-                    if( strstr( strtolower($hostFromDir), strtolower(str_replace($this->wildcardChars, "", $host->attributes()->name ))  )) {
+        foreach ($hostsFromFile->host as $host) {
+            if (strstr($host->attributes()->name, $this->wildcardChars) !== false) {
+                foreach ($hostsFromDir as $hostFromDir) {
+                    if (strstr(strtolower($hostFromDir), strtolower(str_replace($this->wildcardChars, "", $host->attributes()->name)))) {
                         $this->createNewMachine($host, $hostFromDir);
                     }
                 }
@@ -130,42 +136,45 @@ class MachineLoader {
         }
     }
 
-    private function createNewMachine($host, $name = false) {
+    private function createNewMachine($host, $name = false)
+    {
         $machine = new Machine();
-        if($name != false) {
+        if ($name != false) {
             $machine->hostname = $name;
         } else {
-            $machine->hostname = (string) $host->attributes()->name;
+            $machine->hostname = (string)$host->attributes()->name;
         }
-        $machine->profiles[(string) $host->attributes()->{'profile-id'}] = array();
+        $machine->profiles[(string)$host->attributes()->{'profile-id'}] = array();
         $machine->status = $this->machineStatus[1];
-        if(isset($host->profile)) {
-            for($i = 0; $i < count($host->profile); $i++) {
-                $machine->profiles[(string) $host->profile[$i]->attributes()->id] = array();
+        if (isset($host->profile)) {
+            for ($i = 0; $i < count($host->profile); $i++) {
+                $machine->profiles[(string)$host->profile[$i]->attributes()->id] = array();
             }
         }
         $this->machines[$machine->hostname] = $machine;
     }
 
-    private function getHostsFromFolder($folder) {
+    private function getHostsFromFolder($folder)
+    {
         $fileList = $this->getFolderFiles($folder, "xml");
         $files = [];
-        foreach($fileList as $file) {
+        foreach ($fileList as $file) {
             $files[] = $file["filename"];
         }
         return $files;
     }
 
-    private function getProfiles() {
+    private function getProfiles()
+    {
         $profiles = $this->loadFile("profiles.xml");
-        foreach($this->machines as $machine) {
-            foreach($profiles as $profile) {
-                foreach($machine->profiles as $machineProfiles) {
-                    $key = (string) $profile->attributes()->id;
-                    if(array_key_exists($key, $machine->profiles)) {
-                        for($j = 0; $j < count($profile->package); $j++) {
-                            if(!in_array((string) $profile->package[$j]->attributes()->{'package-id'}, $machine->profiles[$key])) {
-                                $machine->profiles[$key][(string) $profile->package[$j]->attributes()->{'package-id'}] = array();
+        foreach ($this->machines as $machine) {
+            foreach ($profiles as $profile) {
+                foreach ($machine->profiles as $machineProfiles) {
+                    $key = (string)$profile->attributes()->id;
+                    if (array_key_exists($key, $machine->profiles)) {
+                        for ($j = 0; $j < count($profile->package); $j++) {
+                            if (!in_array((string)$profile->package[$j]->attributes()->{'package-id'}, $machine->profiles[$key])) {
+                                $machine->profiles[$key][(string)$profile->package[$j]->attributes()->{'package-id'}] = array();
                             }
                         }
                     }
@@ -174,46 +183,47 @@ class MachineLoader {
         }
     }
 
-    private function getHost($hostname) {
+    private function getHost($hostname)
+    {
         $filePath = sprintf("%s%s.xml", $this->pathToHostsXml, $hostname);
         $host = $this->loadFile($filePath);
-        if($host) {
+        if ($host) {
             $machine = $this->machines[$hostname];
             $machine->lastUpdate = $this->getModificationTimeOfFile($filePath);
-            $machine->hostname = (string) $host->attributes()->hostname;
-            $os = explode(", ", (string) $host->attributes()->os);
-            $machine->system['os']['architecture'] = $this->architectures[(string) $host->attributes()->architecture];
+            $machine->hostname = (string)$host->attributes()->hostname;
+            $os = explode(", ", (string)$host->attributes()->os);
+            $machine->system['os']['architecture'] = $this->architectures[(string)$host->attributes()->architecture];
             $machine->system['os']['name'] = $os[0];
             $machine->system['os']['sp'] = intval(str_replace("sp", "", $os[2]));
             $machine->system['os']['version'] = $os[3];
-            $machine->system['domain'] = (string) $host->attributes()->domainname;
-            if($machine->system['os']['architecture'] == null && $machine->system['domain'] == null) {
+            $machine->system['domain'] = (string)$host->attributes()->domainname;
+            if ($machine->system['os']['architecture'] == null && $machine->system['domain'] == null) {
                 $machine->status = $this->machineStatus[2];
             } else {
                 $machine->status = $this->machineStatus[0];
             }
-            foreach($machine->profiles as $profileKey => $profiles) {
-                foreach($host->package as $package) {
+            foreach ($machine->profiles as $profileKey => $profiles) {
+                foreach ($host->package as $package) {
                     // only add version and status if this program is in package
-                    if(array_key_exists( (string) $package->attributes()->id, $machine->profiles[$profileKey] )) {
+                    if (array_key_exists((string)$package->attributes()->id, $machine->profiles[$profileKey])) {
                         $status = $this->_getCurrentStatus($host, $package, $profiles, $machine->profiles);
                         $currentVersion = $this->_getVersion($package);
 
-                        if($status["status"] == $this->packageStatus["TO_UPDATE"]) {
+                        if ($status["status"] == $this->packageStatus["TO_UPDATE"]) {
                             $version = sprintf("%s %s %s", $currentVersion, $this->htmlArrow, $status["newVersion"]);
                         } else {
                             $version = $currentVersion;
                         }
 
-                        $machine->profiles[$profileKey][(string) $package->attributes()->id]["status"]  = $status["status"];
-                        $machine->profiles[$profileKey][(string) $package->attributes()->id]["version"] = $version;
+                        $machine->profiles[$profileKey][(string)$package->attributes()->id]["status"] = $status["status"];
+                        $machine->profiles[$profileKey][(string)$package->attributes()->id]["version"] = $version;
 
 
-                        $machine->profiles[$profileKey][(string) $package->attributes()->id]["name"] = (string) $package->attributes()->name;
+                        $machine->profiles[$profileKey][(string)$package->attributes()->id]["name"] = (string)$package->attributes()->name;
                     } else {
                         // if package is in host.xml and not in packages => to be uninstalled
-                        if(!$this->multiKeyExists( (string) $package->attributes()->id, $machine->profiles ) ) {
-                            $machine->profiles[$profileKey][(string) $package->attributes()->id]["status"] = $this->packageStatus["UNINSTALL"];
+                        if (!$this->multiKeyExists((string)$package->attributes()->id, $machine->profiles)) {
+                            $machine->profiles[$profileKey][(string)$package->attributes()->id]["status"] = $this->packageStatus["UNINSTALL"];
                         }
                     }
                 }
@@ -223,47 +233,49 @@ class MachineLoader {
         }
     }
 
-    private function _getVersion($package) {
-        $revision = (string) $package->attributes()->revision;
+    private function _getVersion($package)
+    {
+        $revision = (string)$package->attributes()->revision;
         if (!strlen($revision)) {
             return ''; // TODO fix this!
         }
-        if($revision[0] == "%" && substr($revision, -1) == "%") {
-            foreach($package->variable as $packageContent) {
+        if ($revision[0] == "%" && substr($revision, -1) == "%") {
+            foreach ($package->variable as $packageContent) {
                 $revision = str_replace("%", "", $revision);
-                if($revision == (string) $packageContent->attributes()->name) {
-                    return (string) $packageContent->attributes()->value;
+                if ($revision == (string)$packageContent->attributes()->name) {
+                    return (string)$packageContent->attributes()->value;
                 }
             }
         } else {
-            return (string) $revision;
+            return (string)$revision;
         }
     }
 
-    private function _getCurrentStatus($host, $package, $profile, $returnNewVersion = true) {
-        $packageVersion = (string) $this->getPackageVersionById($package->attributes()->id);
-        $hostVersion = (string) $this->_getVersion($package);
+    private function _getCurrentStatus($host, $package, $profile, $returnNewVersion = true)
+    {
+        $packageVersion = (string)$this->getPackageVersionById($package->attributes()->id);
+        $hostVersion = (string)$this->_getVersion($package);
         $status = null;
-        if($packageVersion == $hostVersion) {
+        if ($packageVersion == $hostVersion) {
             $status = $this->packageStatus["INSTALLED"];
         }
 
-        if((string) $package->attributes()->execute == "always") {
+        if ((string)$package->attributes()->execute == "always") {
             $status = $this->packageStatus["ALWAYS"];
         }
 
-        if($package->attributes()->id == "chrome") {
+        if ($package->attributes()->id == "chrome") {
             $status = $this->packageStatus["INSTALLED"];
         }
 
-        if($status == null) {
+        if ($status == null) {
             $status = $this->packageStatus["TO_UPDATE"];
         }
 
-        if($returnNewVersion == true) {
+        if ($returnNewVersion == true) {
             return [
-                "newVersion"    =>  $packageVersion,
-                "status"        =>  $status,
+                "newVersion" => $packageVersion,
+                "status" => $status,
             ];
         }
         return $status;
@@ -271,11 +283,12 @@ class MachineLoader {
 
     }
 
-    private function finalize() {
-        foreach($this->machines as $hostname => $machine) {
-            foreach($machine->profiles as $profileName => $profile) {
-                foreach($profile as $packageName => $package) {
-                    if(count($package) == 0) {
+    private function finalize()
+    {
+        foreach ($this->machines as $hostname => $machine) {
+            foreach ($machine->profiles as $profileName => $profile) {
+                foreach ($profile as $packageName => $package) {
+                    if (count($package) == 0) {
                         $newVersion = $this->getPackageVersionById($packageName);
                         $version = sprintf("%s %s", $this->htmlArrow, $newVersion);
                         $this->machines[$hostname]->profiles[$profileName][$packageName]["status"] = $this->packageStatus["TO_INSTALL"];
@@ -286,17 +299,18 @@ class MachineLoader {
         }
     }
 
-    public function getFolderFiles($path, $extension = false) {
+    public function getFolderFiles($path, $extension = false)
+    {
         $path = $this->basePath . $path;
         $directory = scandir($path);
         $files = [];
 
-        foreach($directory as $file) {
+        foreach ($directory as $file) {
             $filePath = $path . $file;
-            if(file_exists($filePath)) {
+            if (file_exists($filePath)) {
                 $fileInfo = pathinfo($file);
-                if($extension !== false) {
-                    if(array_key_exists('extension', $fileInfo) && $fileInfo["extension"] == $extension) {
+                if ($extension !== false) {
+                    if (array_key_exists('extension', $fileInfo) && $fileInfo["extension"] == $extension) {
                         $files[] = $fileInfo;
                     }
                 } else {
@@ -307,11 +321,12 @@ class MachineLoader {
         return $files;
     }
 
-    private function loadFile($path) {
+    private function loadFile($path)
+    {
         $path = sprintf("%s%s", $this->basePath, $path);
-        if(file_exists($path)) {
+        if (file_exists($path)) {
             $document = @simplexml_load_file($path);
-            if($document == false) {
+            if ($document == false) {
                 return false;
             }
             return $document;
@@ -320,10 +335,11 @@ class MachineLoader {
         }
     }
 
-    private function getModificationTimeOfFile($path) {
+    private function getModificationTimeOfFile($path)
+    {
         $path = sprintf("%s%s", $this->basePath, $path);
         $path = realpath($path);
-        if(file_exists($path)) {
+        if (file_exists($path)) {
             $time = filemtime($path);
             return $time;
         } else {
@@ -332,11 +348,12 @@ class MachineLoader {
     }
 
     /* from http://stackoverflow.com/a/19420866 */
-    private function multiKeyExists($key, array $array ) {
+    private function multiKeyExists($key, array $array)
+    {
         if (array_key_exists($key, $array)) {
             return true;
         }
-        foreach ($array as $k=>$v) {
+        foreach ($array as $k => $v) {
             if (!is_array($v)) {
                 continue;
             }

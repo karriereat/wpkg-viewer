@@ -17,8 +17,8 @@ class ProfileController extends Controller
         $profiles = $machineLoader->getAllProfiles();
 
         $machineFound = false;
-        foreach($profiles as $profilesName => $profile) {
-            if(strtolower($profilesName) == $profileNameParam) {
+        foreach ($profiles as $profilesName => $profile) {
+            if (strtolower($profilesName) == $profileNameParam) {
                 $machineFound = true;
                 break;
             }
