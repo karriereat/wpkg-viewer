@@ -9,6 +9,7 @@ See the Laravel docs:  [https://laravel.com/docs/5.4](https://laravel.com/docs/5
 ```
 $ git clone git@github.com:internetztube/wpkg-viewer.git
 $ composer install
+$ php artisan key:generate
 $ npm install
 $ npm run production
 ```
@@ -23,3 +24,6 @@ You have to specify the path to the folder where the generated `.xml` files life
 WPKG_VIEWER_BASE_PATH=/path/to/xml/files
 WPKG_VIEWER_PATH_TO_HOSTS_XML=hostxml/
 ```
+
+## License
+Apache License 2.0 Please see [LICENSE](LICENSE) for more information.
