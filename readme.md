@@ -7,7 +7,7 @@ See the Laravel docs:  [https://laravel.com/docs/5.4](https://laravel.com/docs/5
 
 ## Installation
 ```
-$ git clone git@github.com:internetztube/wpkg-viewer.git
+$ git clone git@github.com:karriereat/wpkg-viewer.git
 $ composer install
 $ php artisan key:generate
 $ npm install
