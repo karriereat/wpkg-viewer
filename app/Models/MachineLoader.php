@@ -60,7 +60,6 @@ class MachineLoader
     public function setEnvVars()
     {
         $this->basePath = env('WPKG_VIEWER_BASE_PATH', 'test-files');
-        $this->basePath = base_path($this->basePath);
         $this->pathToHostsXml = env('WPKG_VIEWER_PATH_TO_HOSTS_XML', 'hostxml/');
     }
 
