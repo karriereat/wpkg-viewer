@@ -12,6 +12,7 @@ class MachineController extends Controller
             'machines' => $machineLoader->machines,
             'profiles' => $machineLoader->getAllProfiles(),
         ];
+
         return View('machines', $data);
     }
 
