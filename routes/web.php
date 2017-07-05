@@ -1,6 +1,6 @@
 <?php
 
-Route::get('/', function() {
+Route::get('/', function () {
     return View('index');
 });
 Route::get('/machine/{hostenameParam}', 'MachineController@detail');

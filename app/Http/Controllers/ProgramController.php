@@ -13,6 +13,7 @@ class ProgramController extends Controller
             'profiles' => $machineLoader->getAllProfiles(),
             'machines' => $machineLoader->machines,
         ];
+
         return View('programs', $data);
     }
 }
