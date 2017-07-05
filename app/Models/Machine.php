@@ -1,4 +1,6 @@
-<?php // refactor me
+<?php
+
+// refactor me
 
 namespace App\Models;
 
@@ -9,12 +11,12 @@ class Machine
     public $profiles = [];
     public $lastUpdate = null;
     public $system = [
-        "os" => [
-            "name" => null,
-            "sp" => null,
-            "version" => null,
-            "architecture" => null,
+        'os' => [
+            'name'         => null,
+            'sp'           => null,
+            'version'      => null,
+            'architecture' => null,
         ],
-        "domain" => null,
+        'domain' => null,
     ];
 }
