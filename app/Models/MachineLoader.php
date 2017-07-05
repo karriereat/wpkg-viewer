@@ -70,19 +70,19 @@ class MachineLoader
         $profiles = [];
         foreach ($this->machines as $machine) {
             foreach ($machine->profiles as $profileName => $profile) {
-                if (!array_key_exists($profileName, $profiles)) {
+                if (! array_key_exists($profileName, $profiles)) {
                     $profiles[$profileName]['packages'] = [];
                     $profiles[$profileName]['amount'] = 1;
                 } else {
                     $profiles[$profileName]['amount']++;
                 }
                 foreach ($profile as $packageName => $package) {
-                    if (!array_key_exists($packageName, $profiles[$profileName]['packages'])) {
+                    if (! array_key_exists($packageName, $profiles[$profileName]['packages'])) {
                         $profiles[$profileName]['packages'][$packageName] = [];
                         $profiles[$profileName]['packages'][$packageName][$package['status']['desc']] = [];
                         $profiles[$profileName]['packages'][$packageName][$package['status']['desc']][] = ['hostname' => $machine->hostname, 'lastUpdate' => $machine->lastUpdate];
                     } else {
-                        if (!array_key_exists($package['status']['desc'], $profiles[$profileName]['packages'][$packageName])) {
+                        if (! array_key_exists($package['status']['desc'], $profiles[$profileName]['packages'][$packageName])) {
                             $profiles[$profileName]['packages'][$packageName][$package['status']['desc']] = [];
                             $profiles[$profileName]['packages'][$packageName][$package['status']['desc']][] = ['hostname' => $machine->hostname, 'lastUpdate' => $machine->lastUpdate];
                         } else {
@@ -177,7 +177,7 @@ class MachineLoader
                     $key = (string) $profile->attributes()->id;
                     if (array_key_exists($key, $machine->profiles)) {
                         for ($j = 0; $j < count($profile->package); $j++) {
-                            if (!in_array((string) $profile->package[$j]->attributes()->{'package-id'}, $machine->profiles[$key])) {
+                            if (! in_array((string) $profile->package[$j]->attributes()->{'package-id'}, $machine->profiles[$key])) {
                                 $machine->profiles[$key][(string) $profile->package[$j]->attributes()->{'package-id'}] = [];
                             }
                         }
@@ -225,7 +225,7 @@ class MachineLoader
                         $machine->profiles[$profileKey][(string) $package->attributes()->id]['name'] = (string) $package->attributes()->name;
                     } else {
                         // if package is in host.xml and not in packages => to be uninstalled
-                        if (!$this->multiKeyExists((string) $package->attributes()->id, $machine->profiles)) {
+                        if (! $this->multiKeyExists((string) $package->attributes()->id, $machine->profiles)) {
                             $machine->profiles[$profileKey][(string) $package->attributes()->id]['status'] = $this->packageStatus['UNINSTALL'];
                         }
                     }
@@ -239,7 +239,7 @@ class MachineLoader
     private function _getVersion($package)
     {
         $revision = (string) $package->attributes()->revision;
-        if (!strlen($revision)) {
+        if (! strlen($revision)) {
             return ''; // TODO fix this!
         }
         if ($revision[0] == '%' && substr($revision, -1) == '%') {
@@ -359,7 +359,7 @@ class MachineLoader
             return true;
         }
         foreach ($array as $k => $v) {
-            if (!is_array($v)) {
+            if (! is_array($v)) {
                 continue;
             }
             if (array_key_exists($key, $v)) {
