@@ -9,6 +9,7 @@ class ProfileController extends Controller
     public function overview(MachineLoader $machineLoader)
     {
         $profiles = $machineLoader->getAllProfiles();
+
         return View('profiles', ['profiles' => $profiles]);
     }
 

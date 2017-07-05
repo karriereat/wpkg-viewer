@@ -10,9 +10,10 @@ class ProgramController extends Controller
     {
         $data = [
             'packageStatuses' => $machineLoader->packageStatus,
-            'profiles' => $machineLoader->getAllProfiles(),
-            'machines' => $machineLoader->machines,
+            'profiles'        => $machineLoader->getAllProfiles(),
+            'machines'        => $machineLoader->machines,
         ];
+
         return View('programs', $data);
     }
 }
