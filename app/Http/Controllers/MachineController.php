@@ -27,7 +27,7 @@ class MachineController extends Controller
                 break;
             }
         }
-        if (!$machineFound) {
+        if (! $machineFound) {
             return abort(404);
         }
 

@@ -25,7 +25,7 @@ class ProfileController extends Controller
             }
         }
 
-        if (!$machineFound) {
+        if (! $machineFound) {
             return redirect(url('profiles'));
         }
 
