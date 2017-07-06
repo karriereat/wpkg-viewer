@@ -26,8 +26,6 @@ You have to specify the path to the folder where the generated `.xml` files life
 `WPKG_VIEWER_BASE_PATH` variable in the `.env` file.
 
 ```
-...
-
 WPKG_VIEWER_BASE_PATH=/path/to/xml/files
 WPKG_VIEWER_PATH_TO_HOSTS_XML=hostxml/
 ```
